@@ -10,46 +10,14 @@ namespace WebAPIDiceShop.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentMethodController : ControllerBase
+    public class PaymentController : ControllerBase
     {
 
-        private IPaymentMethodService paymentMethodService;
+        private IPaymentService paymentService;
 
-        public PaymentMethodController(IPaymentMethodService paymentMethodService)
+        public PaymentController(IPaymentService paymentService)
         {
-            this.paymentMethodService = paymentMethodService;
-        }
-
-
-        [HttpGet("paymentMethod")]
-        public List<PaymentMethodDto> GetPaymentMehods()
-        {
-            return this.paymentMethodService.GetPaymentMethods();
-        }
-
-        [HttpGet("user/{id}")]
-        public PaymentMethodDto GetPayamentMethod(int id)
-        {
-            return this.paymentMethodService.GetPaymentMethod(id);
-        }
-
-        [HttpPost("add")]
-        public bool PostPaymentMehtod(PaymentMethodDto paymentMethodDto)
-        {
-            var createPayment = paymentMethodService.AddPaymentMethod(paymentMethodDto);
-            return createPayment;
-        }
-
-        [HttpPut("edit")]
-        public bool EditPaymentMehtod(PaymentMethodDto paymentMethodDto)
-        {
-            return this.paymentMethodService.UpdatePaymentMethod(paymentMethodDto);
-        }
-
-        [HttpDelete("delete/{id}")]
-        public bool DeletePaymentMehtod(int id)
-        {
-            return this.paymentMethodService.DeletePaymentMethod(id);
+            this.paymentService = paymentService;
         }
 
         [HttpPost("create-checkout-session")]
@@ -84,6 +52,11 @@ namespace WebAPIDiceShop.Controllers
             return Ok(new { url = session.Url });
         }
 
+        [HttpGet("postPurchase")]
+        public bool PostPurchase(int userId)
+        {
+            return paymentService.PostPurchase(userId);
+        }
 
         /* [HttpPost("create-checkout-session")]
          public IActionResult CreateCheckoutSession(OrderRequest order)

@@ -1,6 +1,7 @@
 ﻿using Data;
 using DataModel;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -12,14 +13,15 @@ namespace Service
 {
     internal class AdministratorService : IAdministratorService
     {
-        private readonly DiceShopContext diceShopContext;
-        public AdministratorService(DiceShopContext diceShopContext)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public AdministratorService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.diceShopContext = diceShopContext;
+            diceShopContextFactory = contextFactory;
         }
 
         public bool IsAdmin(int userId)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             return diceShopContext.Administrators.Where(a => a.UserId == userId).ToList().Count > 0;
         }
 

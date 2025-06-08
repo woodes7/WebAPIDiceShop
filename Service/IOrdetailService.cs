@@ -13,7 +13,7 @@ namespace Service
     public interface IOrdetailService
     {
         public List<OrderdetailDto> GetOrdersDteails();
-
+        public List<OrderdetailDto> GetOrderDetailByOrder(int orderId);
         public OrderdetailDto GetOrderDetail(int id);
 
         public bool AddOrderDetail(OrderdetailDto orderdetailDto);

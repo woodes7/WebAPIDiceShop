@@ -13,19 +13,18 @@ namespace Service
 {
     internal class UserService : IUserService
     {
-        private readonly DiceShopContext diceShopContext;
-        private readonly ITokenService tokenService;
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
         private readonly IEmailService emailService;
 
-        public UserService(DiceShopContext diceShopContext)
+        public UserService(IDbContextFactory<DiceShopContext> diceShopContextFactory, IEmailService emailService)
         {                  
-            this.diceShopContext = diceShopContext;
-            this.tokenService = tokenService;
+            this.diceShopContextFactory = diceShopContextFactory;
             this.emailService = emailService;
         }
 
         public bool DeleteUser(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var user = diceShopContext.Users.Find(id);
             if (user == null) return false;
 
@@ -35,12 +34,21 @@ namespace Service
 
         public List<UserDto> GetUsers()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var usersDto = diceShopContext.Users.ProjectToType<UserDto>().ToList();
+            return usersDto;
+        }
+
+        public UserDto GetUserByEmail(string email)
+        {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var usersDto = diceShopContext.Users.FirstOrDefault(u => u.Email == email).Adapt<UserDto>();
             return usersDto;
         }
 
         public async Task<PagedResult<UserDto>> GetUsersPagedAsync(int pageNumber, int pageSize, string? search = null)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var query = diceShopContext.Users.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -65,11 +73,13 @@ namespace Service
 
         public UserDto GetUser(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             return diceShopContext.Users.Find(id).Adapt<UserDto>();
         }
 
         public bool UpdateUser(UserDto userDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var user = diceShopContext.Users.FirstOrDefault(c => c.Id == userDto.Id);
             userDto.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
             if (user == null) return false;
@@ -80,6 +90,7 @@ namespace Service
 
         public bool AddUser(UserDto userDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var userEntity = userDto.Adapt<User>();
 
             // Encriptar la contraseña antes de guardar
@@ -91,6 +102,7 @@ namespace Service
 
         public UserDto Login(string email, string password)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var user = diceShopContext.Users.FirstOrDefault(u => u.Email == email);
 
             if (user == null) return null;
@@ -103,6 +115,7 @@ namespace Service
 
         public bool RegisterUser(UserDto userDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             // Validación mínima: que no exista otro usuario con el mismo email
             if (diceShopContext.Users.Any(u => u.Email == userDto.Email))
                 return false;
@@ -118,6 +131,7 @@ namespace Service
         {
             try
             {
+                using var diceShopContext = diceShopContextFactory.CreateDbContext();
                 var user = diceShopContext.Users.FirstOrDefault(u => u.Email == email);
                 if (user == null || user.EmailConfirmed)
                     return false;
@@ -136,7 +150,7 @@ namespace Service
 
                 // Preparar y enviar email
       
-                var confirmationLink = $"https://localhost:4200/pages/confirm-email?token={token}";
+                var confirmationLink = $"http://localhost:4200/pages/confirm-email/{token}";
                 var subject = "Confirma tu cuenta";
                 var body = $"Haz clic en el siguiente enlace para confirmar tu cuenta: <a href='{confirmationLink}'>Confirmar cuenta</a>";
 
@@ -151,6 +165,7 @@ namespace Service
 
         public bool ConfirmEmail(string tokenValue)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var token = diceShopContext.Tokens
                 .Include(t => t.User)
                 .FirstOrDefault(t => t.TokenValue == tokenValue);

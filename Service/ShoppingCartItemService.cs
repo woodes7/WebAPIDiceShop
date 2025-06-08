@@ -10,24 +10,25 @@ namespace Service
 {
     internal class ShoppingCartItemService : IShoppingCartItemService
     {
-        private readonly DiceShopContext context;
-
-        public ShoppingCartItemService(DiceShopContext context)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public ShoppingCartItemService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.context = context;
+            diceShopContextFactory = contextFactory;
         }
 
         public bool AddItemDto(ShoppingcartitemDto dto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             dto.AddedAt = DateTime.Now;
             var entity = dto.Adapt<Shoppingcartitem>();
-            context.Shoppingcartitems.Add(entity);
-            return context.SaveChanges() > 0;
+            diceShopContext.Shoppingcartitems.Add(entity);
+            return diceShopContext.SaveChanges() > 0;
         }
 
         public ShoppingcartitemDto GetItemDto(int id)
         {
-            var entity = context.Shoppingcartitems
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var entity = diceShopContext.Shoppingcartitems
                 .Include(i => i.Product)
                 .FirstOrDefault(i => i.Id == id);
 
@@ -39,7 +40,8 @@ namespace Service
 
         public List<ShoppingcartitemDto> GetItemsByCartId(int cartId, bool onlyActive = false)
         {
-            var query = context.Shoppingcartitems
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var query = diceShopContext.Shoppingcartitems
                 .Include(i => i.Product)
                 .Where(i => i.ShoppingCartId == cartId);
 
@@ -48,29 +50,30 @@ namespace Service
                 query = query.Where(i => i.Active == true);
             }
 
-            var items = query.ToList();
+           return query.ProjectToType<ShoppingcartitemDto>().ToList();
 
-            return items.Select(i => i.Adapt<ShoppingcartitemDto>()).ToList();
         }
 
 
         public bool UpdateItemDto(ShoppingcartitemDto dto)
         {
-            var entity = context.Shoppingcartitems.FirstOrDefault(i => i.Id == dto.Id);
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var entity = diceShopContext.Shoppingcartitems.FirstOrDefault(i => i.Id == dto.Id);
             if (entity == null) return false;
 
             dto.Adapt(entity);
-            context.Shoppingcartitems.Update(entity);
-            return context.SaveChanges() > 0;
+            diceShopContext.Shoppingcartitems.Update(entity);
+            return diceShopContext.SaveChanges() > 0;
         }
 
         public bool DeleteItemDto(int id)
         {
-            var entity = context.Shoppingcartitems.Find(id);
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var entity = diceShopContext.Shoppingcartitems.Find(id);
             if (entity == null) return false;
 
-            context.Shoppingcartitems.Remove(entity);
-            return context.SaveChanges() > 0;
+            diceShopContext.Shoppingcartitems.Remove(entity);
+            return diceShopContext.SaveChanges() > 0;
         }
     }
 }

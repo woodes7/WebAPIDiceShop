@@ -13,14 +13,15 @@ namespace Service
 {
     internal class DiscountService : IDiscountService
     {
-        private DiceShopContext diceShopContext;
-        public DiscountService(DiceShopContext diceShopContext)
-        {                       
-            this.diceShopContext = diceShopContext;
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public DiscountService(IDbContextFactory<DiceShopContext> contextFactory)
+        {
+            diceShopContextFactory = contextFactory;
         }
 
         public bool AddDiscountDto(DiscountDto discountDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var discountEntity = discountDto.Adapt<Discount>();
             diceShopContext.Discounts.Add(discountEntity);
             return diceShopContext.SaveChanges() > 0;
@@ -28,6 +29,7 @@ namespace Service
 
         public bool DeleteDiscountDto(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var discount = diceShopContext.Discounts.Find(id);
             if (discount == null) return false;
 
@@ -37,17 +39,20 @@ namespace Service
 
         public List<DiscountDto> GetDiscountDto()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var discountDto = diceShopContext.Discounts.ProjectToType<DiscountDto>().ToList();
             return discountDto;
         }
 
         public DiscountDto GetDiscountDto(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             return diceShopContext.Discounts.Find(id).Adapt<DiscountDto>();
         }
 
         public async Task<PagedResult<DiscountDto>> GetDiscountsPagedAsync(int pageNumber, int pageSize, string? search)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var query = diceShopContext.Discounts.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -72,6 +77,7 @@ namespace Service
 
         public bool UpdateDiscountDto(DiscountDto discountDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var discount = diceShopContext.Discounts.FirstOrDefault(c => c.Id == discountDto.Id);
             if (discount == null) return false;
             discountDto.Adapt(discount);

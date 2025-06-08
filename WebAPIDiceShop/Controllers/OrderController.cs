@@ -21,6 +21,12 @@ namespace WebAPIDiceShop.Controllers
             return this.orderService.GetOrders();
         }
 
+        [HttpGet("orderByUser")]
+        public List<OrderDto> GetOrders(int userId)
+        {
+            return this.orderService.GetOrdersByUser(userId);
+        }
+
         [HttpGet("order/{id}")]
         public OrderDto GetOrder(int id)
         {
@@ -28,7 +34,7 @@ namespace WebAPIDiceShop.Controllers
         }
 
         [HttpPost("add")]
-        public bool UpdateOrder(OrderDto order)
+        public OrderDto UpdateOrder(OrderDto order)
         {
             var createOrder = orderService.AddOrder(order);
             return createOrder;

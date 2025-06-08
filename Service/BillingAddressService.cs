@@ -15,15 +15,15 @@ namespace Service
 {
     public class BillingAddressService : IBillingAddressService
     {
-        private DiceShopContext diceShopContext;
-
-        public BillingAddressService(DiceShopContext diceShopContext)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public BillingAddressService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.diceShopContext = diceShopContext;
+            diceShopContextFactory = contextFactory;
         }
 
         public bool AddBillingAddressDto(BillingaddressDto billingAddressDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             // Si se marca como principal, desactivar otras del mismo usuario
             if (billingAddressDto.IsPrimary == true)
             {
@@ -46,6 +46,7 @@ namespace Service
 
         public bool DeleteBillingAddressDto(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var billingAdress = diceShopContext.Billingaddresses.Find(id);
             if (billingAdress == null) return false;
 
@@ -55,12 +56,21 @@ namespace Service
 
         public List<BillingaddressDto> GetBillingAddressesDto()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var billingAdressesDto = diceShopContext.Billingaddresses.ProjectToType<BillingaddressDto>().ToList();
+            return billingAdressesDto;
+        }
+
+        public List<BillingaddressDto> GetBillingAddressesByUser(int userId)
+        {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var billingAdressesDto = diceShopContext.Billingaddresses.Where(b => b.UserId == userId).ProjectToType<BillingaddressDto>().ToList();
             return billingAdressesDto;
         }
 
         public async Task<PagedResult<BillingaddressDto>> GetPagedBillingAddressesAsync(int pageNumber, int pageSize, string? search = null)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var query = diceShopContext.Billingaddresses.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -82,9 +92,15 @@ namespace Service
             };
         }
 
+        public BillingaddressDto GetPrimaryBillingaddress(int userId)
+        {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            return diceShopContext.Billingaddresses.FirstOrDefault(b => b.UserId == userId).Adapt<BillingaddressDto>();
+        }
 
         public BillingaddressDto GetBillingAddressDto(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var billingAddress = diceShopContext.Billingaddresses.Include(b => b.User).FirstOrDefault(b => b.Id == id);
             var billingAddressDto = billingAddress.Adapt<BillingaddressDto>();
             return billingAddressDto;
@@ -92,6 +108,7 @@ namespace Service
 
         public bool UpdateBillingAddressDto(BillingaddressDto billingAddressDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var billingAddress = diceShopContext.Billingaddresses
                 .FirstOrDefault(c => c.Id == billingAddressDto.Id);
             if (billingAddress == null) return false;
@@ -119,6 +136,7 @@ namespace Service
 
         public BillingaddressDto GetPrimaryAddressByUserId(int userId)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var address = diceShopContext.Billingaddresses
                 .FirstOrDefault(a => a.UserId == userId && a.IsPrimary == true);
 

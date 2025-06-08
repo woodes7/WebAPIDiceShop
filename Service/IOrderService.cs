@@ -14,7 +14,9 @@ namespace Service
 
         public OrderDto GetOrder(int id);
 
-        public bool AddOrder(OrderDto orderDto);
+        public List<OrderDto> GetOrdersByUser(int userId);
+
+        public OrderDto AddOrder(OrderDto orderDto);
 
         public bool UpdateOrder(OrderDto orderDto);
 

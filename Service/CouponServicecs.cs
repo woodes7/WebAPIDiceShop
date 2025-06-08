@@ -17,14 +17,15 @@ namespace Service
 {
     internal class CouponService : ICouponService
     {
-        private DiceShopContext diceShopContext;
-        public CouponService(DiceShopContext diceShopContext)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public CouponService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.diceShopContext = diceShopContext;
+            diceShopContextFactory = contextFactory;
         }
 
         public List<CouponDto> GetCoupons()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             return diceShopContext.Coupons
                 .AsNoTracking()
                 .ProjectToType<CouponDto>()
@@ -33,6 +34,7 @@ namespace Service
 
         public async Task<PagedResult<CouponDto>> GetCouponsPagedAsync(int pageNumber, int pageSize, string? search)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var query = diceShopContext.Coupons.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -56,12 +58,14 @@ namespace Service
 
         public CouponDto GetCouponById(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var coupon = diceShopContext.Coupons.Find(id);
             return coupon?.Adapt<CouponDto>();
         }
 
         public bool AddCoupon(CouponDto couponDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var entity = couponDto.Adapt<Coupon>();
             diceShopContext.Coupons.Add(entity);
             return diceShopContext.SaveChanges() > 0;
@@ -69,6 +73,7 @@ namespace Service
 
         public bool UpdateCoupon(CouponDto couponDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var coupon = diceShopContext.Coupons.FirstOrDefault(c => c.Code == couponDto.Code);
             if (coupon == null) return false;
 
@@ -79,6 +84,7 @@ namespace Service
 
         public bool DeleteCoupon(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var coupon = diceShopContext.Coupons.Find(id);
             if (coupon == null) return false;
 
@@ -87,6 +93,7 @@ namespace Service
         }
         public bool UseCoupon(int couponId)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var coupon = diceShopContext.Coupons.FirstOrDefault(c => c.Id == couponId);
             if (coupon == null || coupon.UsedCount >= coupon.Quantity) return false;
 
@@ -97,6 +104,7 @@ namespace Service
 
         public CouponDto GetCouponByCode(string code)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var coupon = diceShopContext.Coupons.FirstOrDefault(c => c.Code == code);
             return coupon?.Adapt<CouponDto>();
         }

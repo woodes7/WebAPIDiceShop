@@ -7,7 +7,6 @@ namespace Model;
 
 public partial class User
 {
-
     public int Id { get; set; }
 
     public string FullName { get; set; }
@@ -18,25 +17,23 @@ public partial class User
 
     public string Phone { get; set; }
 
-    public bool EmailConfirmed { get; set; } = false;
-
     public string Avatar { get; set; }
 
     public DateTime? RegistrationDate { get; set; }
 
-    public virtual ICollection<Billingaddress> Billingaddresses { get; set; } = new List<Billingaddress>();
+    public bool EmailConfirmed { get; set; }
 
     public virtual ICollection<Administrator> Administrators { get; set; } = new List<Administrator>();
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual ICollection<Billingaddress> Billingaddresses { get; set; } = new List<Billingaddress>();
 
-    public virtual ICollection<PaymentMethod> PaymentMethods { get; set; } = new List<PaymentMethod>();
+    public virtual ICollection<Coupon> Coupons { get; set; } = new List<Coupon>();
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<Productreview> Productreviews { get; set; } = new List<Productreview>();
 
     public virtual ICollection<Shoppingcart> Shoppingcarts { get; set; } = new List<Shoppingcart>();
 
     public virtual ICollection<Token> Tokens { get; set; } = new List<Token>();
-
-    public virtual ICollection<Coupon> Coupons { get; set; } = new List<Coupon>();
 }

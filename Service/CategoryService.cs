@@ -8,20 +8,20 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Service
 {
     public class CategoryService : ICategoryService
     {
-        // private IContextFactory contextFactory;
-        private readonly DiceShopContext diceShopContext;
-
-        public CategoryService(DiceShopContext diceShopContext)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public CategoryService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.diceShopContext = diceShopContext;
+            diceShopContextFactory = contextFactory;
         }
         public List<CategoryDto> GetCategories()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             try
             {
                 var categoriesDto = diceShopContext.Categories
@@ -40,6 +40,7 @@ namespace Service
 
         public PagedResult<CategoryDto> GetCategoriesPaged(int page, int pageSize, string search)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var query = diceShopContext.Categories.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -66,11 +67,13 @@ namespace Service
 
         public CategoryDto GetCategoryById(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             return diceShopContext.Categories.Find(id).Adapt<CategoryDto>();
         }
 
         public bool AddCategory(CategoryDto categoryDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var categoryEntity = categoryDto.Adapt<Category>();
             diceShopContext.Categories.Add(categoryEntity);
             return diceShopContext.SaveChanges() > 0;
@@ -79,7 +82,7 @@ namespace Service
 
         public bool DeleteCategory(int id)
         {
-
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var category = diceShopContext.Categories.Find(id);
             if (category == null) return false;
 
@@ -90,6 +93,7 @@ namespace Service
 
         public bool UpdateCategory(CategoryDto categoryDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var category = diceShopContext.Categories.FirstOrDefault(c => c.Id == categoryDto.Id);
             if (category == null) return false;
 

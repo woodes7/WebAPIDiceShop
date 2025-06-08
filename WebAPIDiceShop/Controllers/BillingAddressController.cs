@@ -25,6 +25,13 @@ namespace WebAPIDiceShop.Controllers
 
         }
 
+        [HttpGet("billingAdressesByUser")]
+        public List<BillingaddressDto> GetBillingaddressesByUser(int userId)
+        {
+            return this.billingAddressService.GetBillingAddressesByUser(userId);
+
+        }
+
         [HttpGet("billingAdressesPaged")]
         public async Task<PagedResult<BillingaddressDto>> GetPagedBillingAddresses(int pageNumber, int pageSize, string? search = null)
         {

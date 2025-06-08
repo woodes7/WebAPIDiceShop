@@ -14,36 +14,37 @@ namespace Service
 {
     internal class ProductService : IProductService
     {
-        private readonly IDbContextFactory<DiceShopContext> diceShopContext;
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
         public ProductService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            diceShopContext = contextFactory;
+            diceShopContextFactory = contextFactory;
         }
 
         public bool AddProductDto(ProductDto productDto)
         {
             var productEntity = productDto.Adapt<Product>();
 
-            using var context = diceShopContext.CreateDbContext();
-            context.Products.Add(productEntity);
-            return context.SaveChanges() > 0;
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            diceShopContext.Products.Add(productEntity);
+            return diceShopContext.SaveChanges() > 0;
         }
 
 
         public bool DeleteProductDto(int id)
         {
-            using var context = diceShopContext.CreateDbContext();
-            var product = context.Products.Find(id);
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var product = diceShopContext.Products.Find(id);
             if (product == null) return false;
 
-            context.Products.Remove(product);
-            return context.SaveChanges() > 0;
+            diceShopContext.Products.Remove(product);
+            return diceShopContext.SaveChanges() > 0;
         }
 
         public ProductDto GetProductDto(int id)
         {
-            using var context = diceShopContext.CreateDbContext();
-            var product = context.Products.AsNoTracking().Include(p => p.Category).FirstOrDefault(p => p.Id == id);
+
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var product = diceShopContext.Products.AsNoTracking().Include(p => p.Category).FirstOrDefault(p => p.Id == id);
             var productDto = product.Adapt<ProductDto>();
             return productDto;
         }
@@ -52,9 +53,9 @@ namespace Service
         {
             try
             {
-                using var context = diceShopContext.CreateDbContext();
+                using var diceShopContext = diceShopContextFactory.CreateDbContext();
 
-                var query = context.Products.AsQueryable();
+                var query = diceShopContext.Products.AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
@@ -96,13 +97,13 @@ namespace Service
 
         public bool UpdateProductDto(ProductDto productDto)
         {
-            using var context = diceShopContext.CreateDbContext();
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
 
-            var product = context.Products.FirstOrDefault(c => c.Id == productDto.Id);
+            var product = diceShopContext.Products.FirstOrDefault(c => c.Id == productDto.Id);
             if (product == null) return false;
             productDto.Adapt(product);
-            context.Update(product);
-            return context.SaveChanges() > 0;
+            diceShopContext.Update(product);
+            return diceShopContext.SaveChanges() > 0;
         }
 
 

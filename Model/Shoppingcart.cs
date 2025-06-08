@@ -11,12 +11,9 @@ public partial class Shoppingcart
 
     public int UserId { get; set; }
 
-    public virtual User User { get; set; }
-
-    public bool Active { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<Shoppingcartitem> Shoppingcartitems { get; set; } = new List<Shoppingcartitem>();
 
+    public virtual User User { get; set; }
 }

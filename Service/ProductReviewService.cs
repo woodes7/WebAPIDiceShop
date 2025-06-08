@@ -1,6 +1,7 @@
 ﻿using Data;
 using DataModel;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -12,14 +13,15 @@ namespace Service
 {
     internal class ProductReviewService : IProductReviewService
     {
-        private DiceShopContext diceShopContext;
-        public ProductReviewService(DiceShopContext diceShopContext)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public ProductReviewService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.diceShopContext = diceShopContext;
+            diceShopContextFactory = contextFactory;
         }
 
         public bool AddProductreviewDto(ProductreviewDto productReviewDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var productReviewDtoEntity = productReviewDto.Adapt<Productreview>();
             diceShopContext.Productreviews.Add(productReviewDtoEntity);
             return diceShopContext.SaveChanges() > 0;
@@ -27,6 +29,7 @@ namespace Service
 
         public bool DeleteProductreviewDto(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var productReview = diceShopContext.Productreviews.Find(id);
             if (productReview == null) return false;
 
@@ -36,17 +39,20 @@ namespace Service
 
         public List<ProductreviewDto> GetProductReviewDto()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var productreviwDto = diceShopContext.Productreviews.ProjectToType<ProductreviewDto>().ToList();
             return productreviwDto;
         }
 
         public ProductreviewDto GetProductReviewDto(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             return diceShopContext.Productreviews.Find(id).Adapt<ProductreviewDto>();
         }
 
         public bool UpdateProductreviewDto(ProductreviewDto productreviewDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var productreview = diceShopContext.Productreviews.FirstOrDefault(c => c.Id == productreviewDto.Id);
             if (productreview == null) return false;
             productreviewDto.Adapt(productreview);

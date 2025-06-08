@@ -19,8 +19,6 @@ public partial class Product
 
     public int? CategoryId { get; set; }
 
-    public string Image { get; set; }
-
     public DateTime? CreationDate { get; set; }
 
     public bool? Active { get; set; }
@@ -29,11 +27,11 @@ public partial class Product
 
     public int? DiscountId { get; set; }
 
+    public string Image { get; set; }
+
     public virtual Category Category { get; set; }
 
     public virtual Discount Discount { get; set; }
-
-    public virtual ICollection<Orderdetail> Orderdetails { get; set; } = new List<Orderdetail>();
 
     public virtual ICollection<Productreview> Productreviews { get; set; } = new List<Productreview>();
 

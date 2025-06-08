@@ -11,7 +11,8 @@ namespace Service
     public interface IBillingAddressService
     {
         public List<BillingaddressDto> GetBillingAddressesDto();
-
+        public List<BillingaddressDto> GetBillingAddressesByUser(int userId);
+        public BillingaddressDto GetPrimaryBillingaddress(int userId);
         public Task<PagedResult<BillingaddressDto>> GetPagedBillingAddressesAsync(int pageNumber, int pageSize, string? search = null);
 
         public BillingaddressDto GetBillingAddressDto(int id);

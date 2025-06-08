@@ -11,13 +11,14 @@ namespace Service
 {
     internal class TokenService : ITokenService
     {
-        private readonly DiceShopContext diceShopContext;
+
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
         private readonly IUserService userService;
         private readonly IEmailService emailService;
 
-        public TokenService(DiceShopContext context, IUserService userService, IEmailService emailService)
+        public TokenService(IDbContextFactory<DiceShopContext> diceShopContextFactory, IUserService userService, IEmailService emailService)
         {
-            this.diceShopContext = context;
+            this.diceShopContextFactory = diceShopContextFactory;
             this.userService = userService;
             this.emailService = emailService;
         }
@@ -26,6 +27,7 @@ namespace Service
         {
             try
             {
+                using var diceShopContext = diceShopContextFactory.CreateDbContext();
                 var user = diceShopContext.Users.FirstOrDefault(u => u.Email == email);
                 if (user == null) return null;
 
@@ -76,6 +78,7 @@ namespace Service
         {
             try
             {
+                using var diceShopContext = diceShopContextFactory.CreateDbContext();
                 // Paso 1: Buscar el token por su valor
                 var token = diceShopContext.Tokens.FirstOrDefault(t => t.TokenValue == tokenValue);
                 if (token == null)

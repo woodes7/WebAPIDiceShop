@@ -36,6 +36,12 @@ namespace WebAPIDiceShop.Controllers
             return this.userService.GetUser(id);
         }
 
+        [HttpGet("getUserByEmail")]
+        public UserDto getUserByEmail(string email)
+        {
+            return this.userService.GetUserByEmail(email);
+        }
+
         [HttpPost("add")]
         public bool PostUser(UserDto userDto)
         {
@@ -82,34 +88,29 @@ namespace WebAPIDiceShop.Controllers
         }
 
         [HttpPost("send-confirmation")]
-        public IActionResult SendConfirmationEmail([FromQuery] string email)
+        public bool SendConfirmationEmail([FromQuery] string email)
         {
             try
             {
                 var success = userService.SendConfirmationEmail(email);
 
-                if (!success)
-                    return NotFound("No se encontró el usuario o ya estaba confirmado.");
-
-                return Ok("Correo de confirmación enviado.");
+                return success;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] Error en send-confirmation: {ex.Message}");
-                return StatusCode(500, "Error interno al intentar enviar la confirmación.");
+                return false;
             }
         }
 
 
         [HttpPost("confirm-email")]
-        public IActionResult ConfirmEmail([FromQuery] string token)
+        public bool ConfirmEmail(string token)
         {
             var success = userService.ConfirmEmail(token);
 
-            if (!success)
-                return BadRequest("Token inválido o expirado.");
 
-            return Ok("Cuenta confirmada correctamente.");
+            return success;
         }
 
     }

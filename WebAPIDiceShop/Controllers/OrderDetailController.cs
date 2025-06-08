@@ -19,12 +19,18 @@ namespace WebAPIDiceShop.Controllers
             this.ordetailService = ordetailService;
         }
 
-        [HttpGet("orderDetail")]
-        public List<OrderdetailDto> GetOrders()
+        [HttpGet("orderDetails")]
+        public List<OrderdetailDto> GetOrderDetails()
         {
             return this.ordetailService.GetOrdersDteails();
         }
-       
+
+        [HttpGet("orderDetailByOrder")]
+        public List<OrderdetailDto> GetOrderDetailsByOrder(int orderId)
+        {
+            return this.ordetailService.GetOrderDetailByOrder(orderId);
+        }
+
         [HttpGet("orderDetail/{id}")]
         public OrderdetailDto GetOrderDetail(int id)
         {

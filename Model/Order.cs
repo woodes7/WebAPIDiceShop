@@ -9,21 +9,17 @@ public partial class Order
 {
     public int Id { get; set; }
 
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
 
-    public DateTime? OrderDate { get; set; }
+    public decimal TotalAmount { get; set; }
 
-    public string Status { get; set; }
+    public string BillingAddress { get; set; }
 
-    public int? PaymentMethodId { get; set; }
+    public DateTime OrderDate { get; set; }
 
-    public int? BillingAddressId { get; set; }
-
-    public virtual Billingaddress BillingAddress { get; set; }
+    public string OrderStatus { get; set; }
 
     public virtual ICollection<Orderdetail> Orderdetails { get; set; } = new List<Orderdetail>();
-
-    public virtual PaymentMethod PaymentMethod { get; set; }
 
     public virtual User User { get; set; }
 }

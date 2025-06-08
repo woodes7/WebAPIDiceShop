@@ -15,15 +15,16 @@ namespace Service
     public class OrderdetailService : IOrdetailService
     {
 
-        private DiceShopContext diceShopContext;
-        public OrderdetailService(DiceShopContext diceShopContext)
+        private readonly IDbContextFactory<DiceShopContext> diceShopContextFactory;
+        public OrderdetailService(IDbContextFactory<DiceShopContext> contextFactory)
         {
-            this.diceShopContext = diceShopContext;
+            diceShopContextFactory = contextFactory;
         }
 
         public bool AddOrderDetail(OrderdetailDto orderdetailDto)
         {
-            var order = diceShopContext.Orders.Find(4);
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var order = diceShopContext.Orders.Find(orderdetailDto.OrderId);
             var orderdetailEntity = orderdetailDto.Adapt<Orderdetail>();
             orderdetailEntity.OrderId = order.Id;
             orderdetailEntity.Order = order;
@@ -33,6 +34,7 @@ namespace Service
 
         public bool DeleteOrderDetail(int id)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var orderDetail = diceShopContext.Orderdetails.Find(id);
             if (orderDetail == null) return false;
 
@@ -42,17 +44,26 @@ namespace Service
 
         public OrderdetailDto GetOrderDetail(int id)
         {
-            return diceShopContext.Orderdetails.Include(o => o.Product).FirstOrDefault(o => o.Id == id).Adapt<OrderdetailDto>();
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            return diceShopContext.Orderdetails.FirstOrDefault(o => o.Id == id).Adapt<OrderdetailDto>();
         }
-             
+
+        public List<OrderdetailDto> GetOrderDetailByOrder(int orderId)
+        {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            return diceShopContext.Orderdetails.Where(o => o.OrderId == orderId).ProjectToType<OrderdetailDto>().ToList();
+        }
+
         public List<OrderdetailDto> GetOrdersDteails()
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var OrderdetailsDto = diceShopContext.Orderdetails.ProjectToType<OrderdetailDto>().ToList();
             return OrderdetailsDto;
         }
 
         public bool UpdateOrderDetail(OrderdetailDto orderdetailDto)
         {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
             var orderdetail = diceShopContext.Orderdetails.FirstOrDefault(c => c.Id == orderdetailDto.Id);
             if (orderdetail == null) return false;
             orderdetailDto.Adapt(orderdetail);

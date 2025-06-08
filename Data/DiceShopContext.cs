@@ -28,8 +28,6 @@ public partial class DiceShopContext : DbContext
 
     public virtual DbSet<Orderdetail> Orderdetails { get; set; }
 
-    public virtual DbSet<PaymentMethod> Paymentmethods { get; set; }
-
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<Productreview> Productreviews { get; set; }
@@ -144,27 +142,21 @@ public partial class DiceShopContext : DbContext
 
             entity.ToTable("orders");
 
-            entity.HasIndex(e => e.BillingAddressId, "BillingAddressId");
-
-            entity.HasIndex(e => e.PaymentMethodId, "PaymentMethodId");
-
             entity.HasIndex(e => e.UserId, "UserId");
 
+            entity.Property(e => e.BillingAddress).HasColumnType("text");
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Status).HasMaxLength(50);
-
-            entity.HasOne(d => d.BillingAddress).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.BillingAddressId)
-                .HasConstraintName("orders_ibfk_3");
-
-            entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.PaymentMethodId)
-                .HasConstraintName("orders_ibfk_2");
+            entity.Property(e => e.OrderStatus)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasDefaultValueSql("'comprado'");
+            entity.Property(e => e.TotalAmount).HasPrecision(10, 2);
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("orders_ibfk_1");
         });
 
@@ -176,37 +168,18 @@ public partial class DiceShopContext : DbContext
 
             entity.HasIndex(e => e.OrderId, "OrderId");
 
-            entity.HasIndex(e => e.ProductId, "ProductId");
-
+            entity.Property(e => e.ProductDescription).HasColumnType("text");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(200)
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.Subtotal).HasPrecision(10, 2);
             entity.Property(e => e.UnitPrice).HasPrecision(10, 2);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Orderdetails)
                 .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("orderdetails_ibfk_1");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.Orderdetails)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("orderdetails_ibfk_2");
-        });
-
-        modelBuilder.Entity<PaymentMethod>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("paymentmethods");
-
-            entity.HasIndex(e => e.UserId, "UserId");
-
-            entity.Property(e => e.CreationDate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.IsPrimary).HasDefaultValueSql("'0'");
-            entity.Property(e => e.PaymentDetails).HasMaxLength(255);
-            entity.Property(e => e.PaymentType).HasMaxLength(100);
-
-            entity.HasOne(d => d.User).WithMany(p => p.PaymentMethods)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("paymentmethods_ibfk_1");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -270,7 +243,6 @@ public partial class DiceShopContext : DbContext
             entity.HasIndex(e => e.UserId, "userId");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Active).HasColumnName("active");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime")

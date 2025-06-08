@@ -6,9 +6,9 @@
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Models",
+   "OutputPath": "",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "Data",
+   "ProjectRootNamespace": "Model",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 0,
@@ -40,10 +40,6 @@
       },
       {
          "Name": "orders",
-         "ObjectType": 0
-      },
-      {
-         "Name": "paymentmethods",
          "ObjectType": 0
       },
       {
