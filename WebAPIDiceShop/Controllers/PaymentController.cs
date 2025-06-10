@@ -42,8 +42,8 @@ namespace WebAPIDiceShop.Controllers
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = lineItems,
                 Mode = "payment",
-                SuccessUrl = "http://localhost:4200/views/payment-success",
-                CancelUrl = "http://localhost:4200/views/payment-cancel"
+                SuccessUrl = "https://pablorg.xyz/views/payment-success",
+                CancelUrl = "https://pablorg.xyz/views/payment-cancel"
             };
 
             var service = new SessionService();
@@ -58,38 +58,7 @@ namespace WebAPIDiceShop.Controllers
             return paymentService.PostPurchase(userId);
         }
 
-        /* [HttpPost("create-checkout-session")]
-         public IActionResult CreateCheckoutSession(OrderRequest order)
-         {
-
-             var options = new SessionCreateOptions
-             {
-                 PaymentMethodTypes = new List<string> { "card" },
-                 LineItems = new List<SessionLineItemOptions>
-                 {
-                     new SessionLineItemOptions
-                     {
-                         PriceData = new SessionLineItemPriceDataOptions
-                         {
-                             UnitAmount = (long)order.TotalAmount,
-                             Currency = "eur",
-                             ProductData = new SessionLineItemPriceDataProductDataOptions
-                             {
-                                 Name = "Producto de prueba"
-                             }
-                         },
-                         Quantity = 1
-                     }
-                 },
-                     Mode = "payment",
-                     SuccessUrl = "http://localhost:4200/views/payment-success",
-                     CancelUrl = "http://localhost:4200/views/payment-cancel"
-             };
-             var service = new SessionService();
-             Session session = service.Create(options);
-
-             return Ok(new { url = session.Url });
-         }*/
+    
 
     }
 }

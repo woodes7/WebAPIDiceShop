@@ -150,7 +150,7 @@ namespace Service
 
                 // Preparar y enviar email
       
-                var confirmationLink = $"http://localhost:4200/pages/confirm-email/{token}";
+                var confirmationLink = $"https://pablorg.xyz/pages/confirm-email/{token}";
                 var subject = "Confirma tu cuenta";
                 var body = $"Haz clic en el siguiente enlace para confirmar tu cuenta: <a href='{confirmationLink}'>Confirmar cuenta</a>";
 

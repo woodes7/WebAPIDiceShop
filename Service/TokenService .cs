@@ -42,7 +42,7 @@ namespace Service
                 diceShopContext.SaveChanges();
 
                 // Enlace de recuperación
-                var resetLink = $"http://localhost:4200/pages/change-password?token={token.TokenValue}";
+                var resetLink = $"https://pablorg.xyz/pages/change-password?token={token.TokenValue}";
                 var body = $@"
             <p>Hola {user.FullName},</p>
             <p>Has solicitado restablecer tu contraseña.</p>
