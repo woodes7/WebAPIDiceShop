@@ -2,11 +2,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Model;
 using Service;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -35,6 +40,12 @@ namespace WebAPIDiceShop.Controllers
         {
             return this.userService.GetUser(id);
         }
+        [AllowAnonymous]
+        [HttpGet("checkUser")]
+        public bool CheckUser(string email)
+        {
+            return this.userService.CheckUser(email);
+        }
 
         [HttpGet("getUserByEmail")]
         public UserDto getUserByEmail(string email)
@@ -61,19 +72,56 @@ namespace WebAPIDiceShop.Controllers
             return userService.DeleteUser(id);
         }
 
+        //[HttpGet("login")]
+        //public ActionResult<UserDto> Login(string email, string pass)
+        //{
+        //    var user = userService.Login(email, pass);
+
+        //    if (user == null)
+        //        return Unauthorized("Credenciales inválidas.");
+
+        //    return Ok(user);
+        //}
+
+        [AllowAnonymous]
         [HttpGet("login")]
-        public ActionResult<UserDto> Login(string email, string pass)
+        public IActionResult Login(string email, string pass)
         {
             var user = userService.Login(email, pass);
 
             if (user == null)
                 return Unauthorized("Credenciales inválidas.");
 
-            return Ok(user);
+            // Clave secreta (misma que usas en tu configuración)
+            var key = Encoding.UTF8.GetBytes("12345678901234567890123456789012");
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+            new Claim(ClaimTypes.Name, user.Email),
+            // Puedes agregar más claims si quieres
+        }),
+                Expires = DateTime.UtcNow.AddHours(2),
+                Issuer = "WebAPIDiceShop",
+                Audience = "FrontDiceShop",
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
+
+            // Puedes devolver solo el token o token + info usuario
+            return Ok(new
+            {
+                token = jwt,
+                user = user // o algún DTO reducido, como user.Id, user.Email, user.Name...
+            });
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
-
         public ActionResult<bool> Register([FromBody] UserDto userDto)
         {
             if (userDto == null)
@@ -86,7 +134,7 @@ namespace WebAPIDiceShop.Controllers
 
             return Ok(true);
         }
-
+        [AllowAnonymous]
         [HttpPost("send-confirmation")]
         public bool SendConfirmationEmail([FromQuery] string email)
         {
@@ -103,7 +151,7 @@ namespace WebAPIDiceShop.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [HttpPost("confirm-email")]
         public bool ConfirmEmail(string token)
         {

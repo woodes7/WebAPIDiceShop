@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DataModel;
 using Service;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AdministratorController : ControllerBase

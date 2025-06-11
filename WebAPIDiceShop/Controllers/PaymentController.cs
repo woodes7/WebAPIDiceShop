@@ -1,5 +1,6 @@
 ﻿using Data;
 using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Service;
@@ -8,6 +9,7 @@ using Stripe.Checkout;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase

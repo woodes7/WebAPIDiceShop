@@ -1,4 +1,5 @@
 ﻿using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Service;
@@ -6,6 +7,7 @@ using Service;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController
@@ -16,14 +18,14 @@ namespace WebAPIDiceShop.Controllers
             this.productService = productService;
         }
 
-
+        [AllowAnonymous]
         [HttpGet("products")]
 
         public async Task<PagedResult<ProductDto>> GetProdutcDto(int pageNumber, int pageSize, string? search = null, int? categoryId = null)
         {
             return await productService.GetProductsPagedAsync(pageNumber, pageSize, search, categoryId);
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public ProductDto getProductById(int id) {
 

@@ -26,6 +26,22 @@ namespace Service
             diceShopContext.Productreviews.Add(productReviewDtoEntity);
             return diceShopContext.SaveChanges() > 0;
         }
+        public List<ProductreviewDto> GetReviewsByProductId(int productId)
+        {
+            using var db = diceShopContextFactory.CreateDbContext();
+            return db.Productreviews
+                .Where(r => r.ProductId == productId)
+                .ProjectToType<ProductreviewDto>() // Si usas Mapster
+                .ToList();
+        }
+
+        public ProductreviewDto GetReviewsByProductIdOfUser(int productId, int userId)
+        {
+            using var db = diceShopContextFactory.CreateDbContext();
+            return db.Productreviews
+                .FirstOrDefault(r => r.ProductId == productId && r.UserId == userId)
+                .Adapt<ProductreviewDto>(); // Si usas Mapster
+        }
 
         public bool DeleteProductreviewDto(int id)
         {

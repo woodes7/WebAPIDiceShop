@@ -20,8 +20,6 @@ public partial class DiceShopContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Coupon> Coupons { get; set; }
-
     public virtual DbSet<Discount> Discounts { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -98,26 +96,6 @@ public partial class DiceShopContext : DbContext
 
             entity.Property(e => e.Description).HasColumnType("text");
             entity.Property(e => e.Name).HasMaxLength(100);
-        });
-
-        modelBuilder.Entity<Coupon>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("coupons");
-
-            entity.HasIndex(e => e.UserId, "FK_Coupon_User");
-
-            entity.Property(e => e.Code)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.DiscountAmount).HasPrecision(10, 2);
-            entity.Property(e => e.ExpirationDate).HasColumnType("datetime");
-            entity.Property(e => e.Quantity).HasDefaultValueSql("'1'");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Coupons)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Coupon_User");
         });
 
         modelBuilder.Entity<Discount>(entity =>

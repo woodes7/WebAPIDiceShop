@@ -2,9 +2,11 @@
 using DataModel;
 using Service;
 using Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
 

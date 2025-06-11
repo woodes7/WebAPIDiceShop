@@ -27,10 +27,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "coupons",
-         "ObjectType": 0
-      },
-      {
          "Name": "discounts",
          "ObjectType": 0
       },

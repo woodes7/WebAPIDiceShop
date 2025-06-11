@@ -2,9 +2,11 @@
 using Service;
 using DataModel;
 using Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DiscountController
