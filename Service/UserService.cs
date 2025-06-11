@@ -39,13 +39,6 @@ namespace Service
             return usersDto;
         }
 
-        public UserDto GetUserByEmail(string email)
-        {
-            using var diceShopContext = diceShopContextFactory.CreateDbContext();
-            var usersDto = diceShopContext.Users.FirstOrDefault(u => u.Email == email).Adapt<UserDto>();
-            return usersDto;
-        }
-
         public async Task<PagedResult<UserDto>> GetUsersPagedAsync(int pageNumber, int pageSize, string? search = null)
         {
             using var diceShopContext = diceShopContextFactory.CreateDbContext();
@@ -182,13 +175,11 @@ namespace Service
             return diceShopContext.SaveChanges() > 0;
         }
 
-        public bool CheckUser(string email)
+        public UserDto CheckUser(string email)
         {
             using var diceShopContext = diceShopContextFactory.CreateDbContext();
-            var user = diceShopContext.Users.FirstOrDefault(t => t.Email == email);
-            if(user.EmailConfirmed)
-                return true;
-            return false;
+            var user = diceShopContext.Users.FirstOrDefault(t => t.Email == email).Adapt<UserDto>();
+            return user;
         }
     }
 }

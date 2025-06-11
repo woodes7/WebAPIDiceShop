@@ -42,15 +42,21 @@ namespace WebAPIDiceShop.Controllers
         }
         [AllowAnonymous]
         [HttpGet("checkUser")]
-        public bool CheckUser(string email)
+        public ActionResult CheckUser(string email)
         {
-            return this.userService.CheckUser(email);
-        }
-
-        [HttpGet("getUserByEmail")]
-        public UserDto getUserByEmail(string email)
-        {
-            return this.userService.GetUserByEmail(email);
+            var user =  this.userService.CheckUser(email);
+            if(user!= null)
+                return Ok(new
+                {
+                    email = user,
+                    confirmed = user.EmailConfirmed // o algún DTO reducido, como user.Id, user.Email, user.Name...
+                });
+            else
+                return Ok(new
+                {
+                    email = "",
+                    confirmed = false // o algún DTO reducido, como user.Id, user.Email, user.Name...
+                });
         }
 
         [HttpPost("add")]
@@ -71,17 +77,6 @@ namespace WebAPIDiceShop.Controllers
         {
             return userService.DeleteUser(id);
         }
-
-        //[HttpGet("login")]
-        //public ActionResult<UserDto> Login(string email, string pass)
-        //{
-        //    var user = userService.Login(email, pass);
-
-        //    if (user == null)
-        //        return Unauthorized("Credenciales inválidas.");
-
-        //    return Ok(user);
-        //}
 
         [AllowAnonymous]
         [HttpGet("login")]
