@@ -44,7 +44,7 @@ namespace Service
         {
 
             using var diceShopContext = diceShopContextFactory.CreateDbContext();
-            var product = diceShopContext.Products.AsNoTracking().Include(p => p.Category).FirstOrDefault(p => p.Id == id);
+            var product = diceShopContext.Products.AsNoTracking().Include(p => p.Category).Include(r => r.Discount).FirstOrDefault(p => p.Id == id);
             var productDto = product.Adapt<ProductDto>();
             return productDto;
         }
@@ -55,7 +55,7 @@ namespace Service
             {
                 using var diceShopContext = diceShopContextFactory.CreateDbContext();
 
-                var query = diceShopContext.Products.AsQueryable();
+                var query = diceShopContext.Products.Include(p => p.Discount).AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {

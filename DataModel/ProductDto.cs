@@ -33,4 +33,5 @@ public class ProductDto
 
     public string DiscountCode { get; set; }
 
+    public DiscountDto? Discount { get; set; }
 }
