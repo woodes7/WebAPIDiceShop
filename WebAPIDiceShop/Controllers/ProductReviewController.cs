@@ -23,7 +23,6 @@ namespace WebAPIDiceShop.Controllers
             var reviews = productReviewService.GetProductReviewDto();
             return Ok(reviews);
         }
-        [AllowAnonymous]
         [HttpGet("{id}")]
         public ActionResult<ProductreviewDto> Get(int id)
         {
@@ -32,18 +31,14 @@ namespace WebAPIDiceShop.Controllers
                 return NotFound();
             return Ok(review);
         }
-
+        [AllowAnonymous]
         [HttpGet("byProduct/{productId}")]
-        public ActionResult<List<ProductreviewDto>> GetReviewsByProductId(int productId)
+        public List<ProductreviewDto> GetReviewsByProductId(int productId)
         {
             var reviews = productReviewService.GetReviewsByProductId(productId);
-
-            if (reviews == null || !reviews.Any())
-                return NotFound();
-
-            return Ok(reviews);
+            return reviews;
         }
-
+        [AllowAnonymous]
         [HttpGet("byProductOfUser")]
         public ActionResult<ProductreviewDto> GetReviewsByProductIdOfUser(int productId, int userId)
         {
