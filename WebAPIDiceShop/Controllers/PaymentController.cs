@@ -44,8 +44,8 @@ namespace WebAPIDiceShop.Controllers
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = lineItems,
                 Mode = "payment",
-                SuccessUrl = "http://localhost:4200/views/payment-success",
-                CancelUrl = "http://localhost:4200/views/payment-cancel"
+                SuccessUrl = "https://pablorg.xyz/views/payment-success",
+                CancelUrl = "https://pablorg.xyz/views/payment-cancel"
             };
 
             var service = new SessionService();

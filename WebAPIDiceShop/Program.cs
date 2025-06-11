@@ -56,7 +56,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .WithOrigins("http://localhost:4200") // cambia por tu dominio
+            .WithOrigins("https://pablorg.xyz") // cambia por tu dominio
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
