@@ -10,8 +10,7 @@ namespace DataModel
     {
         public List<OrderItem> Items { get; set; } = new();
         public decimal TotalAmount { get; set; }
-        public BillingaddressDto BillingAddress { get; set; } = new(); // Usa tu DTO real
-        public string? CouponCode { get; set; }
+        public BillingaddressDto BillingAddress { get; set; } = new();      
     }
 
 }

@@ -1,10 +1,12 @@
 using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Service;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ShoppingCartItemController : ControllerBase

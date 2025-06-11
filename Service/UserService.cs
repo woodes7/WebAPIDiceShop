@@ -182,6 +182,13 @@ namespace Service
             return diceShopContext.SaveChanges() > 0;
         }
 
-
+        public bool CheckUser(string email)
+        {
+            using var diceShopContext = diceShopContextFactory.CreateDbContext();
+            var user = diceShopContext.Users.FirstOrDefault(t => t.Email == email);
+            if(user.EmailConfirmed)
+                return true;
+            return false;
+        }
     }
 }

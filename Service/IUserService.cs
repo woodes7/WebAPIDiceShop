@@ -14,6 +14,7 @@ namespace Service
         public Task<PagedResult<UserDto>> GetUsersPagedAsync(int pageNumber, int pageSize, string? search = null);
 
         public UserDto GetUser(int id);
+        public bool CheckUser(string email);
         public UserDto GetUserByEmail(string email);
 
         public bool AddUser(UserDto userDto);

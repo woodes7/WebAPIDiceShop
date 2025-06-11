@@ -1,4 +1,5 @@
 ﻿using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Model;
@@ -32,7 +33,7 @@ namespace WebAPIDiceShop.Controllers
                 message = "Se ha enviado un enlace para restablecer tu contraseña.",                
             });
         }
-
+        [AllowAnonymous]
         // POST: api/token/reset-password
         [HttpPost("reset-password")]
         public IActionResult ResetPassword(string tokenValue, string newPassword)

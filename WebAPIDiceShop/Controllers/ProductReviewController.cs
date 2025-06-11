@@ -1,44 +1,81 @@
 ﻿using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
 namespace WebAPIDiceShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductReviewController
+    public class ProductReviewController : ControllerBase
     {
-        private IProductReviewService productReviewService;
+        private readonly IProductReviewService productReviewService;
 
         public ProductReviewController(IProductReviewService productReviewService)
         {
             this.productReviewService = productReviewService;
         }
-
-        [HttpGet("  ")]
-        public List<ProductreviewDto> GetProductreviewDto()
+        [AllowAnonymous]
+        [HttpGet("prodcutReviews")]
+        public ActionResult<List<ProductreviewDto>> GetAll()
         {
-            return productReviewService.GetProductReviewDto();
+            var reviews = productReviewService.GetProductReviewDto();
+            return Ok(reviews);
+        }
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public ActionResult<ProductreviewDto> Get(int id)
+        {
+            var review = productReviewService.GetProductReviewDto(id);
+            if (review == null)
+                return NotFound();
+            return Ok(review);
+        }
+
+        [HttpGet("byProduct/{productId}")]
+        public ActionResult<List<ProductreviewDto>> GetReviewsByProductId(int productId)
+        {
+            var reviews = productReviewService.GetReviewsByProductId(productId);
+
+            if (reviews == null || !reviews.Any())
+                return NotFound();
+
+            return Ok(reviews);
+        }
+
+        [HttpGet("byProductOfUser")]
+        public ActionResult<ProductreviewDto> GetReviewsByProductIdOfUser(int productId, int userId)
+        {
+            var review = productReviewService.GetReviewsByProductIdOfUser(productId, userId);
+
+            if (review == null)
+                return Ok(null);
+
+            return Ok(review);
         }
 
         [HttpPost("add")]
-        public bool PosProductReview(ProductreviewDto productreviewDto)
+        public bool Add(ProductreviewDto dto)
         {
-
-            var createrProductreview = productReviewService.AddProductreviewDto(productreviewDto);
-            return createrProductreview;
+            bool result = productReviewService.AddProductreviewDto(dto);
+            return result;
         }
 
-        [HttpPut("edit")]
-        public bool EditProductReview(ProductreviewDto productreviewDto)
+        [HttpPost("edit")]
+        public bool Update(ProductreviewDto dto)
         {
-            return productReviewService.UpdateProductreviewDto(productreviewDto);
+            var result = productReviewService.UpdateProductreviewDto(dto);
+            return result;
         }
 
-        [HttpDelete("delete/{id}")]
-        public bool DeleteDiscount(int id)
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
         {
-            return productReviewService.DeleteProductreviewDto(id);
+            var result = productReviewService.DeleteProductreviewDto(id);
+            if (!result)
+                return NotFound();
+            return Ok();
         }
     }
 }
